@@ -1,10 +1,10 @@
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-  if (message?.type === "GAME_COPILOT_PING") {
+  if (message?.type === "SENSA_PING") {
     sendResponse({ ok: true });
     return false;
   }
 
-  if (message?.type === "GAME_COPILOT_CAPTURE_CONTEXT") {
+  if (message?.type === "SENSA_CAPTURE_CONTEXT") {
     try {
       sendResponse({ ok: true, context: collectPageContext() });
     } catch (error) {
@@ -16,7 +16,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     return true;
   }
 
-  if (message?.type === "GAME_COPILOT_GET_CAPTURE_PAGE_INFO") {
+  if (message?.type === "SENSA_GET_CAPTURE_PAGE_INFO") {
     try {
       sendResponse({
         ok: true,
@@ -47,7 +47,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     return true;
   }
 
-  if (message?.type === "GAME_COPILOT_SCROLL_TO") {
+  if (message?.type === "SENSA_SCROLL_TO") {
     try {
       window.scrollTo(message.payload?.x || 0, message.payload?.y || 0);
       sendResponse({ ok: true });
@@ -92,7 +92,7 @@ function collectPageContext() {
     formLabels: collectTextList("label, input, textarea, select", 24),
     tables: collectTables(4),
     lists: collectLists(6),
-    gameHints: collectGameHints(),
+    activityHints: collectActivityHints(),
     siteSpecific: collectSiteSpecificContext(),
     visibleTextExcerpt: visibleText.slice(0, 12000),
     timestamp: new Date().toISOString()
@@ -136,7 +136,7 @@ function collectLists(limit) {
     .filter((items) => items.length);
 }
 
-function collectGameHints() {
+function collectActivityHints() {
   const candidates = Array.from(
     document.querySelectorAll(
       "[class*='score'], [class*='player'], [class*='turn'], [class*='log'], [class*='action'], [id*='score'], [id*='player'], [id*='turn'], [id*='log'], [id*='action']"

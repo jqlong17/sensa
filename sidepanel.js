@@ -2,7 +2,8 @@ const defaultSystemPrompt =
   "你是 Sensa，一个运行在浏览器侧边栏中的 AI 助手。你的核心任务不是空泛聊天，而是尽可能理解用户当前所处的环境：网页内容、页面结构、可选截图，以及历史对话。你需要利用这些材料，帮助用户快速理解当前页面、提炼关键信息、回答问题，并给出下一步建议。回答要求：1. 默认使用中文。2. 尽量简洁，结论优先，避免无意义复述。3. 如果页面信息不足，要明确指出缺失点。4. 优先依据用户当前环境中的最新材料作答，而不是脱离上下文泛泛而谈。5. 可以使用简短 Markdown 来增强可读性，但不要过度排版。6. 你要始终记住：AI 很多时候不是能力不够，而是缺少足够的环境背景信息，因此你的价值在于基于材料做出更贴近真实情境的判断。";
 const defaultBaseUrl = "https://api.aixhan.com/v1";
 const defaultModel = "gpt-5.4";
-const sessionKeyPrefix = "gameCopilotSession:";
+const sessionKeyPrefix = "sensaSession:";
+const legacySessionKeyPrefix = "gameCopilotSession:";
 
 document.addEventListener("DOMContentLoaded", async () => {
   const elements = {
@@ -39,7 +40,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   };
 
   const settingsResponse = await chrome.runtime.sendMessage({
-    type: "GAME_COPILOT_GET_SETTINGS"
+    type: "SENSA_GET_SETTINGS"
   });
 
   if (settingsResponse?.ok) {
@@ -81,7 +82,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   elements.saveSettings.addEventListener("click", async () => {
     const response = await chrome.runtime.sendMessage({
-      type: "GAME_COPILOT_SAVE_SETTINGS",
+      type: "SENSA_SAVE_SETTINGS",
       payload: {
         openaiApiKey: elements.apiKey.value.trim(),
         openaiBaseUrl: (elements.baseUrl.value.trim() || defaultBaseUrl).replace(/\/+$/, ""),
@@ -160,7 +161,12 @@ async function hydratePageSession(state, elements) {
   state.currentPageTitle = pageInfo.title || "";
 
   const stored = await chrome.storage.local.get(state.currentPageKey);
-  const session = normalizeStoredSession(stored[state.currentPageKey]);
+  let session = normalizeStoredSession(stored[state.currentPageKey]);
+  if (!session && pageInfo.url) {
+    const legacyKey = makeLegacyPageKey(pageInfo.url);
+    const legacyStored = await chrome.storage.local.get(legacyKey);
+    session = normalizeStoredSession(legacyStored[legacyKey]);
+  }
   if (session) {
     state.messages = Array.isArray(session.messages) ? session.messages : [];
     state.currentContext = session.currentContext || null;
@@ -187,7 +193,12 @@ async function ensurePageSession(state, elements) {
   state.currentContext = null;
 
   const stored = await chrome.storage.local.get(state.currentPageKey);
-  const session = normalizeStoredSession(stored[state.currentPageKey]);
+  let session = normalizeStoredSession(stored[state.currentPageKey]);
+  if (!session && pageInfo.url) {
+    const legacyKey = makeLegacyPageKey(pageInfo.url);
+    const legacyStored = await chrome.storage.local.get(legacyKey);
+    session = normalizeStoredSession(legacyStored[legacyKey]);
+  }
   if (session) {
     state.messages = Array.isArray(session.messages) ? session.messages : [];
     state.currentContext = session.currentContext || null;
@@ -500,6 +511,10 @@ function makePageKey(url) {
   return `${sessionKeyPrefix}${url || "unknown"}`;
 }
 
+function makeLegacyPageKey(url) {
+  return `${legacySessionKeyPrefix}${url || "unknown"}`;
+}
+
 async function captureContextFromActiveTab(includeScreenshot, screenshotMode) {
   const tab = await getActivePageInfo();
   if (!tab.id) {
@@ -509,7 +524,7 @@ async function captureContextFromActiveTab(includeScreenshot, screenshotMode) {
   await ensureContentScriptReady(tab.id);
 
   const contextResponse = await chrome.tabs.sendMessage(tab.id, {
-    type: "GAME_COPILOT_CAPTURE_CONTEXT"
+    type: "SENSA_CAPTURE_CONTEXT"
   });
 
   if (!contextResponse?.ok) {
@@ -543,7 +558,7 @@ async function captureFullPageScreenshot(tabId, windowId) {
   await ensureContentScriptReady(tabId);
 
   const infoResponse = await chrome.tabs.sendMessage(tabId, {
-    type: "GAME_COPILOT_GET_CAPTURE_PAGE_INFO"
+    type: "SENSA_GET_CAPTURE_PAGE_INFO"
   });
   if (!infoResponse?.ok) {
     throw new Error(infoResponse?.error || "Failed to get page capture info.");
@@ -571,7 +586,7 @@ async function captureFullPageScreenshot(tabId, windowId) {
   for (let index = 0; index < segments; index += 1) {
     const y = Math.min(index * viewportHeight, Math.max(fullHeight - viewportHeight, 0));
     await chrome.tabs.sendMessage(tabId, {
-      type: "GAME_COPILOT_SCROLL_TO",
+      type: "SENSA_SCROLL_TO",
       payload: { x: 0, y }
     });
     await sleep(250);
@@ -591,7 +606,7 @@ async function captureFullPageScreenshot(tabId, windowId) {
   }
 
   await chrome.tabs.sendMessage(tabId, {
-    type: "GAME_COPILOT_SCROLL_TO",
+    type: "SENSA_SCROLL_TO",
     payload: { x: originalX, y: originalY }
   });
   await sleep(100);
@@ -601,7 +616,7 @@ async function captureFullPageScreenshot(tabId, windowId) {
 async function ensureContentScriptReady(tabId) {
   try {
     await chrome.tabs.sendMessage(tabId, {
-      type: "GAME_COPILOT_PING"
+      type: "SENSA_PING"
     });
     return;
   } catch (error) {
@@ -621,7 +636,7 @@ async function ensureContentScriptReady(tabId) {
 
   try {
     await chrome.tabs.sendMessage(tabId, {
-      type: "GAME_COPILOT_PING"
+      type: "SENSA_PING"
     });
   } catch (error) {
     if (isMissingReceiverError(error)) {
@@ -1197,7 +1212,7 @@ function escapeHtml(text) {
 
 async function getEnvironmentTrail() {
   const response = await chrome.runtime.sendMessage({
-    type: "GAME_COPILOT_GET_ENV_TRAIL"
+    type: "SENSA_GET_ENV_TRAIL"
   });
 
   if (!response?.ok) {

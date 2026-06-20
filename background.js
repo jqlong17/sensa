@@ -72,7 +72,7 @@ chrome.sidePanel
   .catch((error) => console.error("Failed to set side panel behavior", error));
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-  if (message?.type === "GAME_COPILOT_ANALYZE") {
+  if (message?.type === "SENSA_ANALYZE") {
     handleAnalyze(message.payload)
       .then((result) => sendResponse({ ok: true, result }))
       .catch((error) =>
@@ -84,7 +84,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     return true;
   }
 
-  if (message?.type === "GAME_COPILOT_GET_SETTINGS") {
+  if (message?.type === "SENSA_GET_SETTINGS") {
     getStoredSettings()
       .then((settings) => sendResponse({ ok: true, settings }))
       .catch((error) =>
@@ -96,7 +96,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     return true;
   }
 
-  if (message?.type === "GAME_COPILOT_SAVE_SETTINGS") {
+  if (message?.type === "SENSA_SAVE_SETTINGS") {
     saveStoredSettings(message.payload || {})
       .then(() => sendResponse({ ok: true }))
       .catch((error) =>
@@ -108,7 +108,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     return true;
   }
 
-  if (message?.type === "GAME_COPILOT_GET_ENV_TRAIL") {
+  if (message?.type === "SENSA_GET_ENV_TRAIL") {
     chrome.storage.local
       .get([ENV_TRAIL_KEY])
       .then((session) =>

@@ -40,7 +40,7 @@ It is designed to give the model more meaningful context from the page the user 
 1. 打开 Chrome，访问 `chrome://extensions`
 2. 开启 `开发者模式`
 3. 点击 `加载已解压的扩展程序`
-4. 选择当前目录 `/Users/ruska/projects/chrome 插件/Game Copilot`
+4. 选择当前目录 `/Users/ruska/projects/chrome 插件/Sensa`
 
 ### Install from release zip / 从 release zip 安装
 
@@ -105,6 +105,14 @@ It is designed to give the model more meaningful context from the page the user 
 - 页面内容与截图都会做 hash 去重，避免浪费 token
 - 历史对话按页面 URL 维度持久化
 - 本地会话快照会做压缩，避免触发浏览器存储配额问题
+
+## Scope / 适用范围
+
+Sensa is a general page-aware assistant, not a game-specific copilot.  
+Sensa 是一个通用的页面环境感知助手，不再是游戏专用助手。
+
+It can work on news sites, docs, dashboards, research pages, tools, and interactive web apps.  
+它可以用于新闻网页、文档页面、数据看板、研究页面、工具站点以及各种交互式网页应用。
 
 ## Name / 命名
 
