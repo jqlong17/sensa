@@ -12,7 +12,7 @@
 
 ## Install
 
-1. Download `sensa-v1.0.0.zip`
+1. Download `sensa-chrome-extension-v1.0.0.zip`
 2. Unzip it locally
 3. Open `chrome://extensions`
 4. Enable Developer Mode

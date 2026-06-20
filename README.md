@@ -44,14 +44,14 @@ It is designed to give the model more meaningful context from the page the user 
 
 ### Install from release zip / 从 release zip 安装
 
-1. Download `sensa-v1.0.0.zip` from the GitHub Release page
+1. Download `sensa-chrome-extension-v1.0.0.zip` from the GitHub Release page
 2. Unzip it to a local folder
 3. Open `chrome://extensions`
 4. Enable `Developer mode`
 5. Click `Load unpacked`
 6. Select the unzipped folder
 
-1. 从 GitHub Release 页面下载 `sensa-v1.0.0.zip`
+1. 从 GitHub Release 页面下载 `sensa-chrome-extension-v1.0.0.zip`
 2. 解压到本地目录
 3. 打开 `chrome://extensions`
 4. 开启 `开发者模式`
