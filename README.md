@@ -1,59 +1,112 @@
 # Sensa
 
-本地 Chrome 扩展 MVP，使用 Chrome 原生右侧 `Side Panel`。
+Sensa is a page-aware Chrome side panel AI assistant.  
+Sensa 是一个具备环境感知能力的 Chrome 侧边栏 AI 助手。
 
-## 功能
+It is designed to give the model more meaningful context from the page the user is currently viewing, instead of acting like a generic chat box.  
+它的目标不是做一个泛泛聊天的工具，而是尽可能把用户当前网页环境中的“感觉材料”带给 AI。
 
-- 在 Chrome 原生右侧栏打开 AI 聊天面板
+## Features / 功能
+
+- Native Chrome `Side Panel` chat UI
+- Multi-turn conversation
+- Per-page chat history persistence
+- Fixed bottom input box
+- Optional page context for each turn
+- Optional screenshot for each turn
+- Screenshot mode: `viewport` or `full page`
+- Expandable per-message details
+- Lightweight tab-switch trail as environment context
+
+- 使用 Chrome 原生 `Side Panel`
 - 支持多轮对话
-- 支持清空历史对话
-- 当前页面的历史对话会保留，收起再展开不会丢
-- 底部固定输入框，不随消息滚动
-- 手动采集当前网页上下文
-- 页面内容和截图都可按轮次独立勾选
-- 支持配置截图范围：当前视野 / 整个页面
-- 每轮用户消息都可展开查看该轮使用的上下文和截图详情
-- 会记录轻量的页面切换轨迹（例如从哪个网页切到哪个网页），作为环境级上下文提供给 AI
+- 按页面保留历史对话
+- 输入框固定在底部
+- 每轮可选是否附带页面内容
+- 每轮可选是否附带截图
+- 支持 `当前视野` / `整个页面` 两种截图范围
+- 每轮消息可展开查看上下文详情
+- 会附带轻量的标签页切换轨迹，帮助 AI 理解用户所处环境
 
-Sensa 的定位不是一个泛泛的聊天工具，而是一个尽可能感知用户当前环境的 AI 助手。
+## Install / 安装
 
-## 安装
+### Load unpacked / 加载已解压扩展
 
-1. 打开 Chrome `chrome://extensions`
-2. 开启开发者模式
-3. 点击“加载已解压的扩展程序”
+1. Open Chrome and visit `chrome://extensions`
+2. Enable `Developer mode`
+3. Click `Load unpacked`
+4. Select this folder
+
+1. 打开 Chrome，访问 `chrome://extensions`
+2. 开启 `开发者模式`
+3. 点击 `加载已解压的扩展程序`
 4. 选择当前目录 `/Users/ruska/projects/chrome 插件/Game Copilot`
 
-## 配置
+### Install from release zip / 从 release zip 安装
 
-1. 点击浏览器工具栏里的插件图标，打开右侧 `Side Panel`
-2. 点击顶部的 `配置`
-3. 填入 `OpenAI API Key`
-4. 默认 `Base URL` 已预设为 `https://api.aixhan.com/v1`，也可以改成你自己的中转
-5. 默认模型为 `gpt-5.4`，也可以修改
-6. 按需修改系统提示词、字体大小、截图范围
-7. 保存
+1. Download `sensa-v1.0.0.zip` from the GitHub Release page
+2. Unzip it to a local folder
+3. Open `chrome://extensions`
+4. Enable `Developer mode`
+5. Click `Load unpacked`
+6. Select the unzipped folder
 
-## 使用
+1. 从 GitHub Release 页面下载 `sensa-v1.0.0.zip`
+2. 解压到本地目录
+3. 打开 `chrome://extensions`
+4. 开启 `开发者模式`
+5. 点击 `加载已解压的扩展程序`
+6. 选择解压后的文件夹
 
-1. 打开任意你希望分析的网页
-2. 点击浏览器工具栏里的扩展图标，打开右侧原生侧边栏
-3. 视需要勾选本轮是否附带页面内容、是否附带截图
-4. 在底部输入框输入你的问题
-5. 点击 `发送`
+## Configuration / 配置
 
-## 当前实现
+1. Open the side panel from the extension icon
+2. Click `配置`
+3. Fill in your `API Key`
+4. The default `Base URL` is `https://api.aixhan.com/v1`
+5. The default model is `gpt-5.4`
+6. Adjust prompt, font size, and screenshot mode if needed
+7. Save
 
-- 为了降低上下文噪音，扩展不会自动实时上传页面
-- 发送时会按本轮勾选自动抓取最新页面内容和截图
-- 页面采集内容包括标题、URL、可见文本摘要、按钮、标题、表格、列表和疑似游戏状态块
-- 历史对话按页面 URL 维度缓存，当前页面收起再展开仍会保留
-- 只有在本轮勾选“附带页面内容”时，才会发送最新页面上下文
-- 只有在本轮勾选“附带截图”时，才会发送截图
-- 会附带少量最近的 tab 切换摘要，帮助 AI 理解用户的环境流，而不是只看当前一句话
+1. 点击浏览器工具栏里的插件图标，打开侧边栏
+2. 点击顶部 `配置`
+3. 填入你的 `API Key`
+4. 默认 `Base URL` 为 `https://api.aixhan.com/v1`
+5. 默认模型为 `gpt-5.4`
+6. 按需调整系统提示词、字体大小、截图范围
+7. 保存设置
 
-## 后续可加
+## Usage / 使用
 
-- 针对 BGA 的定制 DOM 解析器
-- 一键复制当前局面摘要
-- 针对不同站点的专用 prompt 模板
+1. Open any webpage
+2. Open the Sensa side panel
+3. Choose whether to include page context and screenshot for this turn
+4. Type your question
+5. Send
+
+1. 打开任意网页
+2. 打开 Sensa 侧边栏
+3. 选择本轮是否附带页面内容和截图
+4. 输入你的问题
+5. 点击发送
+
+## Notes / 说明
+
+- Sensa does not continuously upload page data in the background
+- Fresh page context is only attached when you check it for the current turn
+- Fresh screenshot is only attached when you check it for the current turn
+- Page context and screenshot hashes are deduplicated to avoid wasting tokens
+- Chat history is persisted per page URL
+- Stored session snapshots are compacted to avoid browser storage quota issues
+
+- Sensa 不会在后台持续实时上传页面
+- 只有在本轮勾选“页面内容”时，才会附带最新页面上下文
+- 只有在本轮勾选“截图”时，才会附带最新截图
+- 页面内容与截图都会做 hash 去重，避免浪费 token
+- 历史对话按页面 URL 维度持久化
+- 本地会话快照会做压缩，避免触发浏览器存储配额问题
+
+## Name / 命名
+
+See [SENSA_BRAND.md](./SENSA_BRAND.md).  
+可参考 [SENSA_BRAND.md](./SENSA_BRAND.md) 了解命名来源。

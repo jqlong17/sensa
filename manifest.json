@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Sensa",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "A page-aware AI assistant for any webpage. It can read the current page context and help with analysis, explanation, and follow-up actions.",
   "permissions": [
     "storage",
