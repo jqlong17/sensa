@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sensa</title>
+    <link rel="stylesheet" href="sidepanel.css" />
+  </head>
+  <body>
+    <main class="panel">
+      <header class="panel-header">
+        <div class="panel-toolbar">
+          <div>
+            <h1 class="panel-title">Sensa</h1>
+          </div>
+          <div class="panel-toolbar-actions">
+            <button id="clear-history" class="panel-icon-button" type="button">清空</button>
+            <button id="settings-toggle" class="panel-icon-button" type="button">配置</button>
+          </div>
+        </div>
+        <div id="settings" class="panel-settings" hidden>
+          <label class="panel-label" for="api-key">API Key</label>
+          <input id="api-key" class="panel-input" type="password" placeholder="sk-..." />
+          <p class="panel-help">
+            没有可用 key？
+            <a
+              class="panel-link"
+              href="https://cdk.aixhan.com/?aff=af_496d95f0c04d"
+              target="_blank"
+              rel="noreferrer"
+            >前往推荐中转购买</a>
+          </p>
+          <label class="panel-label" for="base-url">Base URL</label>
+          <input id="base-url" class="panel-input" type="text" placeholder="https://your-proxy.example.com/v1" />
+          <label class="panel-label" for="model">Model</label>
+          <input id="model" class="panel-input" type="text" placeholder="gpt-5.4" />
+          <label class="panel-label" for="system-prompt">System Prompt</label>
+          <textarea id="system-prompt" class="panel-textarea panel-textarea-small"></textarea>
+          <label class="panel-label" for="font-scale">字体大小</label>
+          <select id="font-scale" class="panel-input">
+            <option value="small">小</option>
+            <option value="medium">中</option>
+            <option value="large">大</option>
+          </select>
+          <label class="panel-label" for="screenshot-mode">截图范围</label>
+          <select id="screenshot-mode" class="panel-input">
+            <option value="viewport">当前视野</option>
+            <option value="fullpage">整个页面</option>
+          </select>
+          <label class="panel-checkbox">
+            <input id="include-page-context-default" type="checkbox" />
+            <span>默认附带页面内容</span>
+          </label>
+          <label class="panel-checkbox">
+            <input id="include-screenshot" type="checkbox" />
+            <span>默认附带当前页面截图</span>
+          </label>
+          <button id="save-settings" class="panel-button primary panel-button-full" type="button">保存设置</button>
+        </div>
+      </header>
+
+      <section class="panel-messages-wrap">
+        <div id="messages" class="panel-messages"></div>
+      </section>
+
+      <footer class="panel-composer">
+        <div id="context-summary" class="panel-context-summary-hidden">发送时会按勾选项自动抓取最新页面内容和截图。</div>
+        <div id="status" class="panel-status-hidden" aria-live="polite"></div>
+        <textarea
+          id="instruction"
+          class="panel-textarea panel-composer-textarea"
+          placeholder="继续追问、让它解释局势、或者让它比较两个行动..."
+        ></textarea>
+        <div class="panel-composer-actions">
+          <div class="panel-turn-options">
+            <label class="panel-checkbox panel-checkbox-inline">
+              <input id="include-page-context-main" type="checkbox" />
+              <span>本轮附带页面内容</span>
+            </label>
+            <label class="panel-checkbox panel-checkbox-inline">
+              <input id="include-screenshot-main" type="checkbox" />
+              <span>本轮附带截图</span>
+            </label>
+          </div>
+          <button id="send-button" class="panel-button primary" type="button">发送</button>
+        </div>
+      </footer>
+    </main>
+    <script src="sidepanel.js"></script>
+  </body>
+  </html>
