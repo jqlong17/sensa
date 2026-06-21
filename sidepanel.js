@@ -11,8 +11,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     instruction: document.getElementById("instruction"),
     sendButton: document.getElementById("send-button"),
     clearHistory: document.getElementById("clear-history"),
+    clearStoredHistory: document.getElementById("clear-stored-history"),
     status: document.getElementById("status"),
     contextSummary: document.getElementById("context-summary"),
+    storageSummary: document.getElementById("storage-summary"),
     settingsToggle: document.getElementById("settings-toggle"),
     settings: document.getElementById("settings"),
     includePageContextMain: document.getElementById("include-page-context-main"),
@@ -59,6 +61,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   await hydratePageSession(state, elements);
+  await refreshStorageSummary(elements);
 
   elements.includePageContextMain.addEventListener("change", () => {
     elements.includePageContextDefault.checked = elements.includePageContextMain.checked;
@@ -99,6 +102,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (response?.ok) {
       elements.settings.hidden = true;
     }
+    await refreshStorageSummary(elements);
     setStatus(
       elements.status,
       response?.ok ? "设置已保存。" : `保存失败：${response?.error || "Unknown error"}`
@@ -142,9 +146,26 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   elements.clearHistory.addEventListener("click", async () => {
     state.messages = [];
+    state.currentContext = null;
+    state.lastSentContextHash = "";
+    state.lastSentScreenshotHash = "";
     renderMessages(elements.messages, state.messages);
+    updateContextSummary(state, elements);
     setStatus(elements.status, "当前页面历史对话已清空。");
     await persistCurrentSession(state);
+    await refreshStorageSummary(elements);
+  });
+
+  elements.clearStoredHistory.addEventListener("click", async () => {
+    await clearAllStoredHistories();
+    state.messages = [];
+    state.currentContext = null;
+    state.lastSentContextHash = "";
+    state.lastSentScreenshotHash = "";
+    renderMessages(elements.messages, state.messages);
+    updateContextSummary(state, elements);
+    await refreshStorageSummary(elements);
+    setStatus(elements.status, "已清空本地保存的所有对话历史。");
   });
 
   renderMessages(elements.messages, state.messages);
@@ -452,6 +473,7 @@ async function sendMessage(state, elements) {
     renderMessages(elements.messages, state.messages);
     scrollMessagesToBottom(elements.messages);
     await persistCurrentSession(state);
+    await refreshStorageSummary(elements);
     setStatus(
       elements.status,
       result.usage
@@ -471,6 +493,7 @@ async function sendMessage(state, elements) {
     renderMessages(elements.messages, state.messages);
     scrollMessagesToBottom(elements.messages);
     await persistCurrentSession(state);
+    await refreshStorageSummary(elements);
     setStatus(elements.status, `发送失败：${failure.shortReason}`);
   } finally {
     state.isBusy = false;
@@ -838,6 +861,52 @@ function scrollMessagesToBottom(container) {
 
 function setStatus(element, text) {
   element.textContent = text;
+}
+
+async function refreshStorageSummary(elements) {
+  const stats = await getStorageStats();
+  elements.storageSummary.textContent =
+    `本地总占用 ${formatBytes(stats.totalBytes)}，其中对话历史 ${formatBytes(stats.historyBytes)}，共 ${stats.historyCount} 个页面会话。`;
+}
+
+async function getStorageStats() {
+  const allStored = await chrome.storage.local.get(null);
+  const allKeys = Object.keys(allStored);
+  const historyKeys = allKeys.filter(
+    (key) => key.startsWith(sessionKeyPrefix) || key.startsWith(legacySessionKeyPrefix)
+  );
+  const totalBytes = await chrome.storage.local.getBytesInUse(null);
+  const historyBytes = historyKeys.length
+    ? await chrome.storage.local.getBytesInUse(historyKeys)
+    : 0;
+
+  return {
+    totalBytes,
+    historyBytes,
+    historyCount: historyKeys.length
+  };
+}
+
+async function clearAllStoredHistories() {
+  const allStored = await chrome.storage.local.get(null);
+  const historyKeys = Object.keys(allStored).filter(
+    (key) => key.startsWith(sessionKeyPrefix) || key.startsWith(legacySessionKeyPrefix)
+  );
+  if (!historyKeys.length) {
+    return;
+  }
+  await chrome.storage.local.remove(historyKeys);
+}
+
+function formatBytes(bytes) {
+  const value = Number(bytes) || 0;
+  if (value < 1024) {
+    return `${value} B`;
+  }
+  if (value < 1024 * 1024) {
+    return `${(value / 1024).toFixed(value < 10 * 1024 ? 1 : 0)} KB`;
+  }
+  return `${(value / (1024 * 1024)).toFixed(2)} MB`;
 }
 
 function normalizeSendError(error) {

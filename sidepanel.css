@@ -88,6 +88,10 @@ body {
   color: #334155;
 }
 
+.panel-label-inline {
+  margin: 0;
+}
+
 .panel-help {
   margin: 8px 0 12px;
   font-size: var(--gc-font-12);
@@ -147,6 +151,11 @@ body {
   color: #0f172a;
 }
 
+.panel-button-small {
+  padding: 6px 9px;
+  font-size: var(--gc-font-12);
+}
+
 .panel-button:disabled {
   opacity: 0.6;
   cursor: wait;
@@ -172,6 +181,28 @@ body {
 
 .panel-checkbox-inline {
   margin-top: 12px;
+}
+
+.panel-storage-card {
+  margin-top: 12px;
+  padding: 10px 11px;
+  border: 1px solid #d6e0f0;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.panel-storage-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.panel-storage-summary {
+  margin-top: 8px;
+  font-size: var(--gc-font-12);
+  line-height: 1.5;
+  color: #64748b;
 }
 
 .panel-messages-wrap {
